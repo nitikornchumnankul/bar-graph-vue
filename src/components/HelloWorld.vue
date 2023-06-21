@@ -4,20 +4,11 @@
   <Bar
     :options="chartOptions"
     :data="chartData"
-    v-on:="this.load_data()"
   />
-  <button @click="load_data">Load Data</button>
-
 
   <p>Check value from chartdata</p>
   <p>{{ this.chartData.datasets[0].data  }}</p>
   <p>{{ this.chartData.labels  }}</p>
-
-  <p>Check value from chartdataNew</p>
-<!-- 
-  <p>{{ this.chartDataNew.datasets[0].data  }}</p>
-  <p>{{ this.chartDataNew.labels  }}</p> -->
-
   
 </template>
 
@@ -38,8 +29,13 @@ export default{
     return {
       data: [],
       temp: [],
+    }
+  },
+  data () {
+      
+    return {
       chartData: {
-        labels: ['January', 'February', 'March', 'April', 'May'],
+        labels: [],
         datasets: [
           {
             label: 'Data One',
@@ -50,30 +46,25 @@ export default{
       },
     }
   },
-  data () {
-      
-    return {
-      chartDataNew: {
-        labels: this.chartData.labels,
+  mounted () {
+    this.fillData()
+  },
+
+  methods: {
+    fillData (){
+      const get_data =  axios.get('http://localhost:8080/data').then(response => {
+      console.log(response.data.data)
+      this.chartData = {
+        labels: response.data.labels,
         datasets: [
           {
             label: 'Data One',
             backgroundColor: '#f87979',
-            data: this.chartData.datasets[0].data
+            data: response.data.data
           }
         ]
-      },
-    }
-  },
-  methods: {
-    load_data: function(){
-      const get_data =  axios.get('http://localhost:8080/data').then(response => {
-      this.temp = response.data.data
-      this.chartData.datasets[0].data = response.data.data
-      this.chartData.datasets[0].label = "Data One"
-      this.chartData.labels = ['January', 'February', 'March', 'April', 'May']
-      console.log(this.chartData.datasets[0].data)
-      console.log(this.chartData.labels)
+      }
+      console.log(this.chartData)
        
     })
     }
